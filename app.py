@@ -3,18 +3,32 @@ import pandas as pd
 from datetime import datetime
 
 # ------------------------------------------------
-# ⚙️ 1. 페이지 설정 및 보안 강화 (메뉴 숨기기)
+# ⚙️ 1. 페이지 설정 및 하단 툴바/메뉴 완벽 제거
 # ------------------------------------------------
 st.set_page_config(page_title="2026년 운명의 수정구슬", page_icon="🔮", layout="wide")
 
-# 우측 상단 메뉴, 푸터, 헤더를 숨겨서 일반 사용자가 소스 코드나 깃허브로 접근하는 것을 방지합니다.
+# CSS를 사용하여 하단 GitHub 버튼, 툴바, 푸터, 헤더를 모두 숨깁니다.
 st.markdown("""
     <style>
+    /* 1. 우측 상단 햄버거 메뉴 숨기기 */
     #MainMenu {visibility: hidden;}
+    
+    /* 2. 하단 'Made with Streamlit' 푸터 숨기기 */
     footer {visibility: hidden;}
+    
+    /* 3. 상단 헤더 라인 숨기기 */
     header {visibility: hidden;}
-    /* 모바일에서 테이블이 잘 보이지 않을 경우 대비한 스타일 */
-    .stDataFrame {width: 100%;}
+    
+    /* 4. [중요] 모바일 하단에 뜨는 GitHub 툴바 및 배지 숨기기 */
+    [data-testid="stToolbar"] {display: none !important;}
+    [data-testid="stDecoration"] {display: none !important;}
+    [data-testid="stStatusWidget"] {display: none !important;}
+    
+    /* 5. 'Made with Streamlit' 배지 링크 차단 */
+    .viewerBadge_container__1QSob {display: none !important;}
+    
+    /* 전체 배경에 맞춰 깔끔하게 정리 */
+    .stApp {bottom: 0px !important;}
     </style>
     """, unsafe_allow_html=True)
 
@@ -140,6 +154,7 @@ with tab3:
         t_dates3 = available_dates[idx3:idx3+7]
         v_df = df[df['Category'] == sel_cat3].copy() if sel_cat3 != '전체 보기' else df.copy().sort_values('Category')
         st.dataframe(v_df[['Category'] + t_dates3].style.map(highlight_status), use_container_width=True)
+
 
 
 
