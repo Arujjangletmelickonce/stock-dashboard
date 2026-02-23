@@ -41,7 +41,7 @@ default_date_str = future_dates[0] if future_dates else available_dates[-1]
 default_date_obj = datetime.strptime(default_date_str, '%Y-%m-%d').date()
 
 # 메인 타이틀 변경
-st.title("🔮 2026년 운명의 수정구슬")
+st.markdown("<h1 style='font-size: clamp(22px, 5vw, 36px);'>🔮 2026년 운명의 수정구슬</h1>", unsafe_allow_html=True)
 st.write("---")
 
 def highlight_status(val):
@@ -156,3 +156,4 @@ with tab3:
         st.caption("💡 표 안에서 스크롤하거나 우측 상단의 '전체화면' 아이콘을 누르면 크게 볼 수 있습니다.")
     else:
         st.warning("선택하신 날짜의 데이터가 없습니다.")
+
