@@ -10,34 +10,26 @@ st.set_page_config(page_title="2026년 운명의 수정구슬", page_icon="🔮"
 # CSS를 사용하여 하단 GitHub 버튼, 툴바, 푸터, 헤더를 모두 숨깁니다.
 st.markdown("""
     <style>
-    /* 1. 기본 메뉴 및 푸터 숨기기 */
-    #MainMenu {visibility: hidden;}
-    footer {visibility: hidden;}
-    header {visibility: hidden;}
+    /* 1. 모든 헤더, 푸터, 툴바, 데코레이션 강제 제거 */
+    #MainMenu, footer, header {visibility: hidden !important; display: none !important;}
+    [data-testid="stHeader"], [data-testid="stToolbar"], [data-testid="stDecoration"] {
+        display: none !important;
+        height: 0 !important;
+    }
     
-    /* 2. 하단 배포(Deploy) 버튼 및 GitHub 관련 툴바 강제 제거 */
+    /* 2. 사파리 하단 'Deploy' 버튼 및 배지 숨기기 (와일드카드 사용) */
     .stAppDeployButton {display: none !important;}
-    [data-testid="stHeader"] {display: none !important;}
-    [data-testid="stToolbar"] {display: none !important;}
-    [data-testid="stDecoration"] {display: none !important;}
-    [data-testid="stStatusWidget"] {display: none !important;}
+    div[class^="viewerBadge"], div[class*="viewerBadge"] {display: none !important;}
+    button[title="Deploy"] {display: none !important;}
     
-    /* 3. 'Made with Streamlit' 배지 및 링크 완벽 차단 */
-    div[class^="viewerBadge"] {display: none !important;}
-    div[class*="viewerBadge"] {display: none !important;}
-    a[href*="streamlit.io"] {display: none !important;}
-    
-    /* 4. 화면 하단 여백 강제 제거 (스크롤 방지) */
+    /* 3. 전체 화면 높이 재조정 (하단 여백 강제 삭제) */
     .stApp {
-        bottom: 0px !important;
-        height: 100vh !important;
-        overflow: hidden !important;
+        bottom: -60px !important; /* 하단 툴바를 화면 밖으로 밀어버림 */
+        height: calc(100vh + 60px) !important;
     }
     
-    /* 5. 텍스트 입력창 등에 생기는 불필요한 테두리 정리 */
-    .stTextInput > div > div > input {
-        -webkit-appearance: none;
-    }
+    /* 4. 스크롤바 숨기기 */
+    ::-webkit-scrollbar {display: none;}
     </style>
     """, unsafe_allow_html=True)
 
@@ -163,6 +155,7 @@ with tab3:
         t_dates3 = available_dates[idx3:idx3+7]
         v_df = df[df['Category'] == sel_cat3].copy() if sel_cat3 != '전체 보기' else df.copy().sort_values('Category')
         st.dataframe(v_df[['Category'] + t_dates3].style.map(highlight_status), use_container_width=True)
+
 
 
 
