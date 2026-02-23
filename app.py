@@ -5,9 +5,9 @@ from datetime import datetime
 # ------------------------------------------------
 # ⚙️ 1. 기본 설정 및 카테고리 분류 함수
 # ------------------------------------------------
-st.set_page_config(page_title="2026 자산 사이클 대시보드", page_icon="📊", layout="wide")
+# 타이틀과 이모지를 수정구슬(🔮)로 변경했습니다.
+st.set_page_config(page_title="2026년 운명의 수정구슬", page_icon="🔮", layout="wide")
 
-# 자산 이름(티커)을 보고 대분류를 짝지어주는 함수
 def get_category(ticker):
     markets = ['Australia', 'Brazil', 'Canada', 'China', 'Dow Jones Islamic Market Titans', 'Dow Jones Transports', 'Dow Jones Utilities', 'France', 'Germany', 'Great Britain', 'Hong Kong', 'India', 'Israel', 'Italy', 'Japan', 'Korea', 'Nasdaq', 'Russia', 'S&P 500 E-minis']
     bonds = ['10 Year Bond Yield 1994-', 'Fed Funds 1990-', '10 Year Treasury Notes', '30 Year Treasury Bonds']
@@ -25,7 +25,6 @@ def get_category(ticker):
 @st.cache_data
 def load_data():
     df = pd.read_csv('2026forcast.csv', index_col=0)
-    # 데이터프레임에 'Category(대분류)' 파생 변수 추가
     df['Category'] = df.index.map(get_category)
     return df
 
@@ -35,14 +34,14 @@ except FileNotFoundError:
     st.error("📂 '2026forcast.csv' 파일을 찾을 수 없습니다.")
     st.stop()
 
-# 날짜 데이터 처리 (Category 열 제외하고 날짜만 추출)
 available_dates = [col for col in df.columns if col != 'Category']
 today_str = datetime.now().strftime('%Y-%m-%d')
 future_dates = [d for d in available_dates if d >= today_str]
 default_date_str = future_dates[0] if future_dates else available_dates[-1]
 default_date_obj = datetime.strptime(default_date_str, '%Y-%m-%d').date()
 
-st.title("📊 2026 자산 사이클 대시보드")
+# 메인 타이틀 변경
+st.title("🔮 2026년 운명의 수정구슬")
 st.write("---")
 
 def highlight_status(val):
@@ -60,7 +59,7 @@ def highlight_status(val):
 tab1, tab2, tab3 = st.tabs(["📅 날짜별 모아보기", "🔍 종목별 흐름보기", "🌐 전체 종목 한눈에 보기"])
 
 # ==========================================
-# 탭 1: 날짜별 + 대분류 필터 모아보기
+# 탭 1: 날짜별 모아보기
 # ==========================================
 with tab1:
     st.subheader("💡 특정 날짜의 상태별 종목 현황")
@@ -70,14 +69,12 @@ with tab1:
         selected_date_obj = st.date_input("조회할 개장일을 선택하세요", default_date_obj, key="tab1_date")
         selected_date = selected_date_obj.strftime('%Y-%m-%d')
     with col_cat:
-        # 카테고리 필터 추가 (전체 보기 포함)
         categories = ['전체 보기'] + list(df['Category'].unique())
         selected_cat1 = st.selectbox("대분류를 선택하세요", categories)
     
     if selected_date not in available_dates:
         st.warning(f"{selected_date}은(는) 개장일 데이터가 없습니다.")
     else:
-        # 선택한 카테고리에 맞춰 데이터 필터링
         if selected_cat1 != '전체 보기':
             filtered_df = df[df['Category'] == selected_cat1]
         else:
@@ -101,17 +98,15 @@ with tab1:
             for ticker in downtrends: st.write(f"- {ticker}")
 
 # ==========================================
-# 탭 2: 대분류 -> 소분류 2단계 선택 방식
+# 탭 2: 종목별 흐름보기
 # ==========================================
 with tab2:
     st.subheader("🗓️ 특정 종목의 향후 2주 흐름")
     
     col_main, col_sub = st.columns(2)
     with col_main:
-        # 1단계: 대분류 선택
         selected_main_cat = st.selectbox("1단계: 대분류 선택", df['Category'].unique())
     with col_sub:
-        # 2단계: 대분류에 속한 종목들만 모아서 소분류 선택
         sub_tickers = df[df['Category'] == selected_main_cat].index.tolist()
         selected_ticker = st.selectbox("2단계: 종목 선택", sub_tickers)
         
@@ -120,7 +115,7 @@ with tab2:
     
     if start_date2 in available_dates:
         start_idx = available_dates.index(start_date2)
-        end_idx = min(start_idx + 10, len(available_dates)) # 향후 10일치
+        end_idx = min(start_idx + 10, len(available_dates))
         target_dates = available_dates[start_idx:end_idx]
         
         ticker_data = df.loc[selected_ticker, target_dates]
@@ -131,7 +126,7 @@ with tab2:
         st.warning("선택하신 날짜의 데이터가 없습니다.")
 
 # ==========================================
-# 탭 3: 전체 종목 (카테고리별로 정렬하여 보기)
+# 탭 3: 전체 종목 한눈에 보기
 # ==========================================
 with tab3:
     st.subheader("🌐 전체 종목 향후 7일치 흐름 한눈에 보기")
@@ -148,15 +143,12 @@ with tab3:
         end_idx = min(start_idx + 7, len(available_dates))
         target_dates = available_dates[start_idx:end_idx]
         
-        # 카테고리 필터링 적용
         if selected_cat3 != '전체 보기':
             view_df = df[df['Category'] == selected_cat3].copy()
         else:
             view_df = df.copy()
-            # 전체 보기일 경우, 카테고리별로 묶어서 정렬
             view_df = view_df.sort_values(by=['Category'])
             
-        # 표에 보여줄 열만 선택 ('Category' 열 포함하여 보여주면 좋음)
         columns_to_show = ['Category'] + target_dates
         all_trend_df = view_df[columns_to_show]
         
