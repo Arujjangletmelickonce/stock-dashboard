@@ -22,8 +22,8 @@ st.markdown("""
 # 🔒 2. 보안: 비밀번호 잠금 기능
 # ------------------------------------------------
 
-"""
-def check_password():
+
+#def check_password():
     def password_entered():
         # 🔑 원하는 비밀번호로 수정하세요 (예: "2026")
         if st.session_state["password"] == "1234":
@@ -42,11 +42,11 @@ def check_password():
         st.error("🚫 비밀번호가 틀렸습니다. 다시 시도해 주세요.")
         return False
     return True
-"""
+
 
 # 비밀번호 통과 못하면 중단
-if not check_password():
-    st.stop()
+#if not check_password():
+#    st.stop()
 
 # ------------------------------------------------
 # 📥 3. 데이터 로딩 및 분류 시스템
@@ -163,4 +163,5 @@ with tab3:
         t_dates3 = available_dates[idx3:idx3+7]
         v_df = df[df['Category'] == sel_cat3].copy() if sel_cat3 != '전체 보기' else df.copy().sort_values('Category')
         st.dataframe(v_df[['Category'] + t_dates3].style.map(highlight_status), use_container_width=True)
+
 
