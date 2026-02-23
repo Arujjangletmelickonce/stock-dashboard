@@ -16,29 +16,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# ------------------------------------------------
-# 🔒 2. 보안: 비밀번호 잠금 (임시 해제하려면 아래 if문을 주석처리하세요)
-# ------------------------------------------------
-def check_password():
-    def password_entered():
-        if st.session_state["password"] == "1234":
-            st.session_state["password_correct"] = True
-            del st.session_state["password"]
-        else:
-            st.session_state["password_correct"] = False
 
-    if "password_correct" not in st.session_state:
-        st.markdown("<h2 style='text-align: center;'>🔒 접근 제한 구역</h2>", unsafe_allow_html=True)
-        st.text_input("🔑 비밀번호를 입력하세요:", type="password", on_change=password_entered, key="password")
-        return False
-    elif not st.session_state["password_correct"]:
-        st.text_input("🔑 비밀번호를 입력하세요:", type="password", on_change=password_entered, key="password")
-        st.error("🚫 비밀번호가 틀렸습니다.")
-        return False
-    return True
-
-if not check_password():
-    st.stop()
 
 # ------------------------------------------------
 # 📥 3. 데이터 로드 및 휴장일 계산
@@ -171,3 +149,4 @@ with tab3:
     t_dates3 = available_dates_str[idx3:idx3+7]
     v_df = df[df['Category'] == sel_cat3].copy() if sel_cat3 != '전체 보기' else df.copy().sort_values('Category')
     st.dataframe(v_df[['Category'] + t_dates3].style.map(highlight_status), use_container_width=True)
+
