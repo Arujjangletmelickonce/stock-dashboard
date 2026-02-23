@@ -2,6 +2,15 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime
 
+st.markdown("""
+    <style>
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+    </style>
+    """, unsafe_allow_html=True)
+
+
 # ------------------------------------------------
 # ⚙️ 1. 기본 설정 및 카테고리 분류 함수
 # ------------------------------------------------
@@ -156,6 +165,7 @@ with tab3:
         st.caption("💡 표 안에서 스크롤하거나 우측 상단의 '전체화면' 아이콘을 누르면 크게 볼 수 있습니다.")
     else:
         st.warning("선택하신 날짜의 데이터가 없습니다.")
+
 
 
 
