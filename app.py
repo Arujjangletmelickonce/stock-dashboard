@@ -35,8 +35,8 @@ def load_data():
         markets = ['Australia', 'Brazil', 'Canada', 'China', 'Dow Jones Islamic Market Titans', 'Dow Jones Transports', 'Dow Jones Utilities', 'France', 'Germany', 'Great Britain', 'Hong Kong', 'India', 'Israel', 'Italy', 'Japan', 'Korea', 'Nasdaq', 'Russia', 'S&P 500 E-minis']
         bonds = ['10 Year Bond Yield 1994-', 'Fed Funds 1990-', '10 Year Treasury Notes', '30 Year Treasury Bonds']
         currencies = ['Australian Dollar', 'British Pound', 'Canadian Dollar', 'US Dollar Index', 'Euro Currency', 'Japanese Yen', 'Mexican Peso', 'New Zealand Dollar', 'Swiss Franc']
-        crypto_etf = ['GBTC', 'QQQ', 'USRT', 'FNGU']
-        commodities = ['Copper', 'Gold', 'Palladium', 'Platinum', 'Silver', 'URA', 'Cocoa', 'Coffee', 'Cotton', 'Lumber', 'Orange Juice', 'Sugar', 'Crude Oil Long-Term Cycle', 'Crude Oil', 'Heating Oil', 'Natural Gas', 'RBOB Unleaded', 'Feeder Cattle', 'Live Cattle', 'Lean Hogs', 'Corn', 'Oats', 'Soybeans', 'Soybean Meal', 'Soybean Oil', 'Wheat', 'Dow Jones Commodity Index', 'Goldman Sachs Commodity Index']
+        crypto_etf = ['Comparison of Ethereum and Binance to GBTC', 'GBTC', 'URA', 'QQQ', 'USRT', 'FNGU']
+        commodities = ['Copper', 'Gold', 'Palladium', 'Platinum', 'Silver', 'Cocoa', 'Coffee', 'Cotton', 'Lumber', 'Orange Juice', 'Sugar', 'Crude Oil Long-Term Cycle', 'Crude Oil', 'Heating Oil', 'Natural Gas', 'RBOB Unleaded', 'Feeder Cattle', 'Live Cattle', 'Lean Hogs', 'Corn', 'Oats', 'Soybeans', 'Soybean Meal', 'Soybean Oil', 'Wheat', 'Dow Jones Commodity Index', 'Goldman Sachs Commodity Index']
         
         if ticker in markets: return '🌎 국가 및 지수'
         elif ticker in bonds: return '🏦 금리 및 채권'
@@ -50,25 +50,18 @@ def load_data():
 
 df = load_data()
 
-# 💡 [핵심 기능 2] 비주식 항목들을 위한 야후 파이낸스 대표 ETF 티커 딕셔너리
+# 비주식 항목들을 위한 야후 파이낸스 대표 ETF 티커 딕셔너리
 ETF_MAPPING = {
-    # 국가/지수
     'Australia': 'EWA', 'Brazil': 'EWZ', 'Canada': 'EWC', 'China': 'FXI',
     'France': 'EWQ', 'Germany': 'EWG', 'Great Britain': 'EWU', 'Hong Kong': 'EWH',
     'India': 'INDA', 'Israel': 'EIS', 'Italy': 'EWI', 'Japan': 'EWJ',
     'Korea': 'EWY', 'Nasdaq': 'QQQ', 'S&P 500 E-minis': 'SPY',
     'Dow Jones Transports': 'IYT', 'Dow Jones Utilities': 'XLU',
-    
-    # 금리/채권
     '10 Year Treasury Notes': 'IEF', '30 Year Treasury Bonds': 'TLT',
-    
-    # 원자재 (주요 품목 위주)
     'Gold': 'GLD', 'Silver': 'SLV', 'Copper': 'CPER',
     'Crude Oil': 'USO', 'Natural Gas': 'UNG', 'Heating Oil': 'UHN',
     'Corn': 'CORN', 'Soybeans': 'SOYB', 'Wheat': 'WEAT',
     'Goldman Sachs Commodity Index': 'GSG', 'Dow Jones Commodity Index': 'DJP',
-    
-    # 암호화폐 관련
     'GBTC': 'GBTC', 'URA': 'URA', 'QQQ': 'QQQ', 'USRT': 'USRT', 'FNGU': 'FNGU'
 }
 
@@ -105,7 +98,7 @@ def highlight_status(val):
 
 tab1, tab2, tab3 = st.tabs(["📅 날짜별 모아보기", "🔍 종목별 흐름보기", "🌐 전체 종목 현황"])
 
-# --- 탭 1, 탭 3은 이전과 동일하므로 생략하지 않고 그대로 포함 ---
+# --- 탭 1: 날짜별 모아보기 ---
 with tab1:
     st.subheader("💡 오늘의 상태별 종목")
     col_d, col_c = st.columns(2)
@@ -133,6 +126,7 @@ with tab1:
         st.error(f"📉 단기하락")
         for t in d_data[d_data == '단기하락'].index: st.write(f"- {t}")
 
+# --- 탭 3: 전체 종목 현황 (탭 순서 배치상 코드 위치) ---
 with tab3:
     st.subheader("🌐 카테고리별 전체 현황")
     d3_col, c3_col = st.columns(2)
@@ -149,9 +143,9 @@ with tab3:
     v_df = df[df['Category'] == sel_cat3].copy() if sel_cat3 != '전체 보기' else df.copy().sort_values('Category')
     st.dataframe(v_df[['Category'] + t_dates3].style.map(highlight_status), use_container_width=True)
 
-# --- 탭 2: 종목별 흐름보기 (+ 연속된 차트 배경) ---
+# --- 탭 2: 종목별 흐름보기 (+ 미래 예측 차트) ---
 with tab2:
-    st.subheader("🗓️ 종목별 향후 10일 흐름")
+    st.subheader("🗓️ 종목별 흐름 및 차트 분석")
     m_col, s_col = st.columns(2)
     with m_col:
         m_cat = st.selectbox("대분류", df['Category'].unique(), key="t2_m")
@@ -168,7 +162,7 @@ with tab2:
     res = pd.DataFrame({"날짜": t_dates, "상태": df.loc[s_ticker, t_dates].values})
     st.dataframe(res.style.map(highlight_status, subset=['상태']), use_container_width=True, hide_index=True)
 
-    # 💡 [업그레이드] ETF 매핑 확인 및 차트 표시 조건 변경
+    # 💡 [핵심 기능] ETF 매핑 확인 및 차트 표시 조건
     yf_ticker = None
     if m_cat == '📈 개별 주식':
         yf_ticker = "BRK-B" if "BRK-B" in s_ticker else s_ticker
@@ -177,20 +171,29 @@ with tab2:
         
     if yf_ticker:
         st.write("---")
-        # ETF인 경우 괄호 안에 실제 티커 기호 표시
         display_name = f"{s_ticker} ({yf_ticker})" if m_cat != '📈 개별 주식' else s_ticker
-        st.subheader(f"📊 {display_name} 주가 차트 및 사이클 분석")
+        st.subheader(f"📊 {display_name} 실시간 주가 및 미래 사이클 예측")
         
-        period_choice = st.radio("조회 기간을 선택하세요:", ["1주일", "1개월", "3개월"], index=2, horizontal=True)
-        if period_choice == "1주일": yf_period = "5d"
-        elif period_choice == "1개월": yf_period = "1mo"
-        else: yf_period = "3mo"
+        # 조회 기간에 따라 '미래 투영(연장) 기간'을 다르게 설정
+        period_choice = st.radio("조회 기간을 선택하세요 (과거 데이터 기준):", ["1주일", "1개월", "3개월"], index=2, horizontal=True)
+        if period_choice == "1주일": 
+            yf_period = "5d"
+            future_days = 5  # 앞으로 5일 더 그리기
+        elif period_choice == "1개월": 
+            yf_period = "1mo"
+            future_days = 10 # 앞으로 10일 더 그리기
+        else: 
+            yf_period = "3mo"
+            future_days = 30 # 앞으로 30일 더 그리기
         
         try:
             stock_data = yf.Ticker(yf_ticker)
             hist = stock_data.history(period=yf_period)
             
             if not hist.empty:
+                # timezone 제거 (Matplotlib과의 충돌 방지)
+                hist.index = hist.index.tz_localize(None)
+                
                 last_price = hist['Close'].iloc[-1]
                 prev_price = hist['Close'].iloc[-2] if len(hist) > 1 else last_price
                 change = last_price - prev_price
@@ -200,6 +203,7 @@ with tab2:
                           value=f"${last_price:,.2f}", 
                           delta=f"{change:,.2f} ({change_pct:.2f}%)")
                 
+                # 범례 추가
                 st.markdown("""
                 <div style="display: flex; gap: 15px; font-size: 14px; margin-bottom: 10px;">
                     <div><span style="display:inline-block; width:15px; height:15px; background-color:#d4edda; border-radius:3px; border:1px solid #ccc;"></span> 상승 예측</div>
@@ -209,40 +213,47 @@ with tab2:
                 """, unsafe_allow_html=True)
 
                 fig, ax = plt.subplots(figsize=(10, 4))
+                
+                # 1. 실제 주가 선 그리기
                 ax.plot(hist.index, hist['Close'], color='#1f77b4', linewidth=2, marker='o', markersize=4)
                 
-                # 💡 [핵심 기능 1] 빈 공간(주말)을 없애기 위해 '과거 상태 채우기(Forward Fill)' 로직 구현
-                last_bg_color = None
+                # 2. 미래와 과거를 구분하는 점선 그리기 (오늘 기준)
+                last_actual_date = hist.index[-1]
+                ax.axvline(x=last_actual_date, color='gray', linestyle='--', linewidth=1.5, alpha=0.8)
                 
-                # 차트에 그려진 매일(주말 포함)을 순회하며 배경 칠하기
+                # 구분선 옆에 "미래 예측 ▶" 텍스트 삽입
+                y_max = ax.get_ylim()[1]
+                ax.text(last_actual_date + timedelta(days=1), y_max, 'Future ▶', color='gray', fontsize=11, fontweight='bold', va='top')
+                
+                # 3. 과거부터 ~ 미래(미래일수 추가)까지 배경색 채우기 로직
                 start_date = hist.index[0].date()
-                end_date = hist.index[-1].date()
+                end_date = last_actual_date.date() + timedelta(days=future_days)
                 num_days = (end_date - start_date).days + 1
+                
+                last_bg_color = None
                 
                 for i in range(num_days):
                     current_date_obj = start_date + timedelta(days=i)
                     date_str = current_date_obj.strftime('%Y-%m-%d')
                     
-                    # 오늘 날짜에 대한 예측 데이터가 있는지 확인
                     if date_str in df.columns:
                         status = df.loc[s_ticker, date_str]
-                        if status == '단기상승':
-                            last_bg_color = '#d4edda'
-                        elif status == '단기하락':
-                            last_bg_color = '#f8d7da'
-                        elif status == '스윗스팟':
-                            last_bg_color = '#fff3cd'
-                        else:
-                            last_bg_color = None
+                        if status == '단기상승': last_bg_color = '#d4edda'
+                        elif status == '단기하락': last_bg_color = '#f8d7da'
+                        elif status == '스윗스팟': last_bg_color = '#fff3cd'
+                        else: last_bg_color = None
                             
-                    # 데이터가 없더라도(주말/휴장일) 가장 최근(금요일 등)의 색상 유지
+                    # Forward Fill 방식으로 주말 및 빈 날짜 색칠
                     if last_bg_color:
-                        # matplotlib용 날짜 객체 생성 (timezone 제거)
                         plot_date = datetime.combine(current_date_obj, datetime.min.time())
                         start_x = plot_date - timedelta(days=0.5)
                         end_x = plot_date + timedelta(days=0.5)
                         ax.axvspan(start_x, end_x, color=last_bg_color, alpha=0.6, lw=0)
                 
+                # 4. 차트의 X축 길이를 '미래 예측 범위'까지 강제로 늘려줌
+                ax.set_xlim(hist.index[0] - timedelta(days=1), last_actual_date + timedelta(days=future_days + 1))
+                
+                # 차트 꾸미기
                 ax.xaxis.set_major_formatter(mdates.DateFormatter('%m-%d'))
                 plt.xticks(rotation=45)
                 ax.set_ylabel("Price (USD)")
@@ -258,8 +269,6 @@ with tab2:
         except Exception as e:
             st.error("차트를 불러오는 중 오류가 발생했습니다.")
     else:
-        # ETF 매핑이 안 된 항목인 경우
         if m_cat != '📈 개별 주식':
             st.write("---")
             st.info(f"💡 '{s_ticker}' 항목은 지원되는 대표 ETF 티커가 없어 차트를 제공하지 않습니다.")
-
